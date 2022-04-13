@@ -95,7 +95,11 @@ const AssignAttributeForm: FC<Props> = (props) => {
 
   return (
     <Form form={form} layout="inline" size="middle" onFinish={onFinish}>
-      <Item label="Authority Namespace">
+      <Item
+          label="Authority Namespace"
+          name="authority"
+          rules={[{ required: true, message: 'Please select Authority Namespace!' }]}
+      >
         <AutoComplete
           defaultActiveFirstOption
           name="authority"
@@ -106,7 +110,11 @@ const AssignAttributeForm: FC<Props> = (props) => {
         />
       </Item>
 
-      <Item label="Attribute Name" name="name">
+      <Item
+          label="Attribute Name"
+          name="name"
+          rules={[{ required: true, message: 'Please select Attribute Name!' }]}
+      >
         <AutoComplete
           name="name"
           onSelect={onAttributeName}
@@ -116,7 +124,11 @@ const AssignAttributeForm: FC<Props> = (props) => {
         />
       </Item>
 
-      <Item label="Attribute Value" name="value">
+      <Item
+          label="Attribute Value"
+          name="value"
+          rules={[{ required: true, message: 'Please select Attribute Value!' }]}
+      >
         <AutoComplete
           name="value"
           options={attributeValOptions}
