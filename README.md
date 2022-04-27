@@ -26,10 +26,16 @@ docker run -p 3000:80 \
   -e KEYCLOAK_REALMS="opentdf-realms" \
   -e ATTRIBUTES_HOST="http://localhost/v2/attributes" \
   -e ENTITLEMENTS_HOST="http://localhost/v2/entitlements" \
+  -e SERVER_BASE_PATH="" \
   $(docker build -q .)
 ```
 Input Format : 
 KEYCLOAK_REALMS="item1,item2,item3"
+
+SERVER_BASE_PATH - for abacus relative path support , 
+example : SERVER_BASE_PATH="/abacus"
+
+
 
 The environment variables becomes `window.__SERVER_DATA__` via an NGINX sub_filter defined in nginx-default.conf
 
