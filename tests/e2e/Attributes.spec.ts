@@ -1,9 +1,19 @@
-import { expect } from '@playwright/test';
+import {expect, Page} from '@playwright/test';
 import { authorize, createAuthority, firstTableRowClick } from './helpers/operations';
 import { test } from './helpers/fixtures';
 import { selectors } from "./helpers/selectors";
 
 test.describe('<Attributes/>', () => {
+
+  const createAttributeAndVerifyResultMsg = async (page: Page, name: string, value: string) => {
+    await page.locator(selectors.attributesPage.openNewSectionBtn).click();
+    await page.fill(selectors.attributesPage.newSection.attributeNameField, name);
+    await page.fill(selectors.attributesPage.newSection.orderField, value);
+    await page.click(selectors.attributesPage.newSection.submitAttributeBtn);
+    const attributeCreatedMsg2 = await page.locator(selectors.alertMessage, {hasText: `Attribute created for`})
+    await expect(attributeCreatedMsg2).toBeVisible()
+  }
+
   test.beforeEach(async ({ page, authority }) => {
     await authorize(page);
     await page.goto('/attributes');
@@ -25,12 +35,7 @@ test.describe('<Attributes/>', () => {
   });
 
   test('should add attribute, should filter attributes by Name, Order, Rule', async ({ page, attributeName, authority, attributeValue }) => {
-    await page.locator(selectors.attributesPage.openNewSectionBtn).click();
-    await page.fill(selectors.attributesPage.newSection.attributeNameField, attributeName);
-    await page.fill(selectors.attributesPage.newSection.orderField, attributeValue);
-    await page.click(selectors.attributesPage.newSection.submitAttributeBtn);
-    const attributeCreatedMsg = await page.locator(selectors.alertMessage, {hasText: `Attribute created for`})
-    await expect(attributeCreatedMsg).toBeVisible()
+    await createAttributeAndVerifyResultMsg(page, attributeName, attributeValue)
 
     const attributesHeader = selectors.attributesPage.attributesHeader;
     const filterModal = attributesHeader.filterModal;
@@ -222,5 +227,32 @@ test.describe('<Attributes/>', () => {
     const updatedTableSize = updatedTableRows.length
 
     expect(updatedTableSize === (originalTableSize - 1)).toBeTruthy()
+  });
+
+  test('should edit attribute rule', async ({ page , attributeName, attributeValue}) => {
+    const existedOrderValue = page.locator('.ant-tabs-tab-btn >> nth=0')
+    const editRuleBtn = page.locator('.ant-btn',{hasText: "Edit Rule"})
+    const ruleDropdown = page.locator('.attribute-rule__select')
+    const restrictiveAccessDropdownOption = page.locator('.ant-select-item-option', {hasText:'Restrictive Access'})
+    const saveRuleBtn = page.locator('.ant-btn',{hasText: "Save rule"})
+    const ruleUpdatedMsg = page.locator(selectors.alertMessage, {hasText: `Rule was updated!`})
+
+    await createAttributeAndVerifyResultMsg(page, attributeName, attributeValue)
+    await existedOrderValue.click({force:true})
+    await editRuleBtn.click()
+    await ruleDropdown.click()
+    await restrictiveAccessDropdownOption.click()
+    await saveRuleBtn.click()
+    await expect(ruleUpdatedMsg).toBeVisible()
+  });
+
+  test('should be able to log out', async ({ page }) => {
+    await page.click(selectors.logoutButton)
+    await page.waitForNavigation();
+    await page.waitForSelector(selectors.loginButton);
+    // check that data isn't shown
+    const authorityDropdown = page.locator(".ant-select-selector >> nth=1")
+    await authorityDropdown.click()
+    await expect(page.locator('.ant-empty-description')).toHaveText('No Data')
   });
 });
