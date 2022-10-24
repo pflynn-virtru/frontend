@@ -116,6 +116,11 @@ const AttributeListItem: FC<Props> = (props) => {
   }, []);
 
   const handleSaveClick = useCallback(async () => {
+    const isSomeItemEmpty = activeOrderList.some((item) => !item.trim());
+    if (isSomeItemEmpty) {
+      return;
+    }
+
     const data = {
       authority: activeAuthority,
       name: activeAttribute?.name,
