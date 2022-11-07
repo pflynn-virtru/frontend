@@ -79,6 +79,14 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
+  chart:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - run: npm i @opentdf/client
 #   FIXME replace when working
 #  chart:
 #    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
